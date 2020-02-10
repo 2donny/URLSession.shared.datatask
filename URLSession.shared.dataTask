@@ -1,0 +1,33 @@
+ //codable
+        URLSession.shared.dataTask(with: hasURL) { (data, response, error) in //
+            let Decoder = JSONDecoder()
+            guard let data = data else {
+                return
+            }
+            
+            do {
+                
+                let user = try Decoder.decode([LoginUser].self, from: data)
+                print("user ==> \(user)")
+                
+                if let hasUserInfo = user.first { //userName, password를 정상적으로 썼을 경우
+                    User.shared.info = hasUserInfo
+                    
+                    DispatchQueue.main.async {
+                        self.dismiss(animated: true, completion: nil)
+                    }//9분 44초
+                    
+                    
+                }else {//UI적인 것들, 즉 앱 화면에 직접적으로 표시가 되는 것들은 메인쓰레드에서 작성하기로 '약속'함.
+                    DispatchQueue.main.async {
+                        let alert = UIAlertController(title: "유저정보 없음.", message: nil, preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+                        alert.addAction(UIAlertAction(title: "취소", style: .default, handler: nil))
+                        self.present(alert, animated: true, completion: nil)
+                    }
+                }
+                
+            }catch {
+                //에러 처리
+                print("error ==> \(error)")
+            }
