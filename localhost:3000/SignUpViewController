@@ -1,0 +1,56 @@
+//
+//  SignUpVC.swift
+//  SignIn
+//
+//  Created by 정이든 on 2020/02/09.
+//  Copyright © 2020 2donny. All rights reserved.
+//
+
+import UIKit
+
+class SignUpVC: UIViewController {
+    @IBOutlet weak var usernamefield: UITextField!
+    @IBOutlet weak var passwordfield: UITextField!
+    @IBOutlet weak var emailfield: UITextField!
+    @IBOutlet weak var SignupButton: UIButton!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        SignupButton.layer.cornerRadius = SignupButton.bounds.size.height / 2
+        SignupButton.layer.borderWidth = 1
+        SignupButton.layer.borderColor = UIColor.blue.cgColor
+    }
+    
+
+    @IBAction func SignUpAPICall(_ sender: Any) {
+        let params = ["name": usernamefield.text ?? "",
+                      "password": passwordfield.text ?? "",
+                      "email": emailfield.text ?? ""
+        ] //아이디, 비번, 메일 친거 파라미터로 받기
+        
+        
+        if let url = URL(string: "http://localhost:3000/LoginUsers") {
+            var request = URLRequest.init(url: url)//URLRequest 객체를 통해 호출할 수 있는 주소만듬. signUp버튼을 누르는게,요청하는거니까.
+            request.httpMethod = "POST"
+            request.httpBody = params.queryString.data(using: .utf8)
+            
+            URLSession.shared.dataTask(with: request) { (data, response, error) in
+                guard let data = data else {
+                    return
+                }
+                do {
+                    let decoder = JSONDecoder()
+                    let user = try decoder.decode(LoginUser.self, from: data)
+                    
+                }catch {
+                    
+                }
+            }.resume()
+            
+        }
+    }
+    
+    @IBAction func pop(_ sender: Any) {
+     self.navigationController?.popViewController(animated: true)
+    }
+}
